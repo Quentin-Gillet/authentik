@@ -74,6 +74,7 @@ class ProviderInfoView(View):
             ),
             "response_types_supported": [
                 ResponseTypes.CODE,
+                ResponseTypes.TOKEN,
                 ResponseTypes.ID_TOKEN,
                 ResponseTypes.ID_TOKEN_TOKEN,
                 ResponseTypes.CODE_TOKEN,

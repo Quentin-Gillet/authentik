@@ -101,6 +101,7 @@ class ResponseTypes(models.TextChoices):
     """Response Type required by the client."""
 
     CODE = "code", _("code (Authorization Code Flow)")
+    TOKEN = "token", _("token (Implicit Flow)")
     ID_TOKEN = "id_token", _("id_token (Implicit Flow)")
     ID_TOKEN_TOKEN = "id_token token", _("id_token token (Implicit Flow)")
     CODE_TOKEN = "code token", _("code token (Hybrid Flow)")

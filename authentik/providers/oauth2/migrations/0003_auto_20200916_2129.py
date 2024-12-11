@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                     ("code id_token token", "code id_token token (Hybrid Flow)"),
                 ],
                 default="code",
-                help_text="Response Type required by the client.",
+                help_text=" required by the client.",
             ),
         ),
     ]

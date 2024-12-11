@@ -76,6 +76,7 @@ class Migration(migrations.Migration):
                     models.TextField(
                         choices=[
                             ("code", "code (Authorization Code Flow)"),
+                            ("token", "token (Implicit Flow)"),
                             ("id_token", "id_token (Implicit Flow)"),
                             ("id_token token", "id_token token (Implicit Flow)"),
                             ("code token", "code token (Hybrid Flow)"),
