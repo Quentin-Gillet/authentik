@@ -26,7 +26,7 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         with:
-          image-name: ghcr.io/goauthentik/server,beryju/authentik
+          image-name: ghcr.io/quentin-gillet/authentik/server,beryju/authentik
       - name: Docker Login Registry
         uses: docker/login-action@v3
         with:
@@ -92,7 +92,7 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         with:
-          image-name: ghcr.io/goauthentik/${{ matrix.type }},beryju/authentik-${{ matrix.type }}
+          image-name: ghcr.io/quentin-gillet/authentik/${{ matrix.type }},beryju/authentik-${{ matrix.type }}
       - name: make empty clients
         run: |
           mkdir -p ./gen-ts-api
@@ -169,27 +169,6 @@ jobs:
           file: ./authentik-outpost-${{ matrix.type }}_${{ matrix.goos }}_${{ matrix.goarch }}
           asset_name: authentik-outpost-${{ matrix.type }}_${{ matrix.goos }}_${{ matrix.goarch }}
           tag: ${{ github.ref }}
-  upload-aws-cfn-template:
-    permissions:
-      # Needed for AWS login
-      id-token: write
-      contents: read
-    needs:
-      - build-server
-      - build-outpost
-    env:
-      AWS_REGION: eu-central-1
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: "arn:aws:iam::016170277896:role/github_goauthentik_authentik"
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Upload template
-        run: |
-          aws s3 cp website/docs/install-config/install/aws/template.yaml s3://authentik-cloudformation-templates/authentik.ecs.${{ github.ref }}.yaml
-          aws s3 cp website/docs/install-config/install/aws/template.yaml s3://authentik-cloudformation-templates/authentik.ecs.latest.yaml
   test-release:
     needs:
       - build-server
@@ -206,34 +185,3 @@ jobs:
           docker compose up --no-start
           docker compose start postgresql redis
           docker compose run -u root server test-all
-  sentry-release:
-    needs:
-      - build-server
-      - build-outpost
-      - build-outpost-binary
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: prepare variables
-        uses: ./.github/actions/docker-push-variables
-        id: ev
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        with:
-          image-name: ghcr.io/goauthentik/server
-      - name: Get static files from docker image
-        run: |
-          docker pull ${{ steps.ev.outputs.imageMainName }}
-          container=$(docker container create ${{ steps.ev.outputs.imageMainName }})
-          docker cp ${container}:web/ .
-      - name: Create a Sentry.io release
-        uses: getsentry/action-release@v1
-        continue-on-error: true
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: authentik-security-inc
-          SENTRY_PROJECT: authentik
-        with:
-          version: authentik@${{ steps.ev.outputs.version }}
-          sourcemaps: "./web/dist"
-          url_prefix: "~/static/dist"
