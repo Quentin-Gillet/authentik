@@ -26,7 +26,7 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         with:
-          image-name: ghcr.io/quentin-gillet/authentik/server,beryju/authentik
+          image-name: ghcr.io/quentin-gillet/authentik/server
       - name: Docker Login Registry
         uses: docker/login-action@v3
         with:
@@ -92,7 +92,7 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         with:
-          image-name: ghcr.io/quentin-gillet/authentik/${{ matrix.type }},beryju/authentik-${{ matrix.type }}
+          image-name: ghcr.io/quentin-gillet/authentik/${{ matrix.type }}
       - name: make empty clients
         run: |
           mkdir -p ./gen-ts-api
